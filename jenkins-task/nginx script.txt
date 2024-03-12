@@ -1,0 +1,73 @@
+
+Nginx configuration using pipeline and webhooks:---
+
+1) Create a repository
+2) Create a clone of repo with our git 
+3) Create a file in vs code and push into the gihub
+   #!/bin/bash
+   sudo apt update
+   sudo apt-get install nginx
+   sudo systemctl start nginx
+4) Create a node in jenkins  
+5) Create a webhooks in github by using :-
+   http://ip_address:8080/github-webhook
+6) Go into jenkins pipeline and add git hub link into git hub option and check on webhooks
+7) Write a pipeline in groovy
+
+create a 2 instance (master-instance)&(node-instance) and configure it.
+connect (master-instance) to install jenkins using all this command 
+ 
+ $ sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+    https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+    echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+  $ sudo apt-get update
+  $ sudo apt-get install jenkins
+  $ sudo systemctl start jenkins
+
+After installed jenkins configure it proper process. after that on dashboard ------> manage jenkins-->create a node--->
+
+step1:- new node--> (xyz) 
+        description-->(xyz)
+        no. of excutors-->(1)(as per yours)
+        remote root directory-->(/home/ubuntu)
+        usage-->(same as per default)
+        launch update-->(launch agent via SSH)
+                        (host-->cpoy your node public IP address)
+                        (credential-->add-->kind-->SSH username with private key-->ID-->description-->username-->enter directly key)
+        host key verification-->(non verifying verification)
+        availability-->(keep this agent online)
+        aunch agent 
+
+
+step2:- node get online go to dash board and create a new item
+        enter name-->(as per yours)
+        select pipeline mode and (OK)
+        description-->(as per yours)
+        github project-->(github URL)
+        github hook project--(select)
+        script-->(add your script) & add
+        build your-->(script)
+
+SCRIPT..
+
+pipeline {
+    agent {
+        label 'label1'
+    }
+    stages{
+        stage("git pull"){
+            steps{
+                sh'''sudo bash ./Demo-/file.sh'''
+            }
+        }
+        stage("install nginx"){
+            steps{
+                sh'''sudo apt updaate'''
+                sh'''sudo apt install nginx -y'''
+                sh'''sudo systemctl start nginx'''
+            }
+        }
+    }
+}

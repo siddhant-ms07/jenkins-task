@@ -1,0 +1,82 @@
+Topic:-- PHP web app groovy file
+
+
+create a 2 instance (master-instance)&(node-instance) and configure it.
+connect (master-instance) to install jenkins using all this command 
+          $sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+          https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+          echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+          https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+          /etc/apt/sources.list.d/jenkins.list > /dev/null
+          $ sudo apt-get update
+          $ sudo apt-get install jenkins
+          $ sudo systemctl start jenkins
+                                                                   
+After installed jenkins configure it proper process. after that on dashboard ------> manage jenkins-->create a node--->
+
+
+step1:- new node--> (xyz) 
+        description-->(xyz)
+        no. of excutors-->(1)(as per yours)
+        remote root directory-->(/home/ubuntu)
+        usage-->(same as per default)
+        launch update-->(launch agent via SSH)
+                        (host-->cpoy your node public IP address)
+                        (credential-->add-->kind-->SSH username with private key-->ID-->description-->username-->enter directly key)
+        host key verification-->(non verifying verification)
+        availability-->(keep this agent online)
+        launch agent 
+
+
+step2:- node get online go to dash board and create a new item
+        enter name-->(as per yours)
+        select pipeline mode and (OK)
+        description-->(as per yours)
+        github project-->(github URL)
+        script-->(add your script) & add
+        build your-->(script)
+
+
+SCRIPT...
+pipeline{
+    agent{
+        label 'agent1'
+    }
+    stages{
+        stage('Pull a file from git')
+        {
+            steps{
+                git 'https://github.com/jonastaedcke/prjct.git'
+            }
+        }
+        stage('Installing Apache2')
+        {
+            steps{
+                sh " sudo apt-get update"
+                sh " sudo apt-get install apache2 -y"
+                sh " sudo  systemctl start apache2"
+            }
+        }
+        stage('Install PHP')
+        {
+            steps{
+                sh " sudo  apt-get install php -y"
+                sh " sudo  apt install php-all-dev -y"
+                sh " sudo apt install php-intl -y"
+                sh " sudo apt install php-mbstring -y"
+            }
+        }
+        stage('removing file from apache2 folder')
+        {
+            steps{
+                sh " sudo rm -r /var/www/html/*"
+            }
+        }
+        stage('Deploying sysPass')
+        {
+            steps{
+                sh " sudo cp -r ./* /var/www/html"
+            }
+        }
+    }
+}

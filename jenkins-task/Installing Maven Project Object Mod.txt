@@ -1,0 +1,83 @@
+Installing Maven Project Object Model:--
+
+
+create a 2 instance (master-instance)&(node-instance) and configure it.
+connect (master-instance) to install jenkins using all this command 
+          $sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
+          https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+          echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+          https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+          /etc/apt/sources.list.d/jenkins.list > /dev/null
+          $ sudo apt-get update
+          $ sudo apt-get install jenkins
+          $ sudo systemctl start jenkins
+                                                                   
+After installed jenkins configure it proper process. after that on dashboard ------> manage jenkins-->create a node--->
+
+
+step1:- new node--> (xyz) 
+        description-->(xyz)
+        no. of excutors-->(1)(as per yours)
+        remote root directory-->(/home/ubuntu)
+        usage-->(same as per default)
+        launch update-->(launch agent via SSH)
+                        (host-->cpoy your node public IP address)
+                        (credential-->add-->kind-->SSH username with private key-->ID-->description-->username-->enter directly key)
+        host key verification-->(non verifying verification)
+        availability-->(keep this agent online)
+        launch agent 
+
+
+step2:- node get online go to dash board and create a new item
+        enter name-->(as per yours)
+        select pipeline mode and (OK)
+        description-->(as per yours)
+        github project-->(github URL)
+        script-->(add your script) & add
+        build your-->(script)
+
+
+SCRIPT:---
+
+pipeline {
+     agent{
+        label 'label1'
+    } 
+    stages {
+        stage(pull) {
+            steps{
+                
+                   git "https://github.com/AnupDudhe/studentapp-ui"
+                   
+            }
+        }
+        stage(install maven) {
+            steps{
+                sh '''
+                  sudo apt update
+                  sudo apt install maven -y
+                  sudo apt install unzip -y
+                  '''
+            }
+        }
+        stage(download apache-tomcat) {
+            steps{
+                sh '''
+                  sudo wget  https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.99/bin/apache-tomcat-8.5.99.zip  
+                  sudo unzip apache-tomcat-8.5.99.zip
+                  sudo mvn clean
+                  sudo mvn package
+                  sudo mv ./target/*.war  ./apache-tomcat-8.5.99/webapps/
+                 '''
+            }
+        }  
+         stage(starting) {
+            steps{
+                sh '''
+                  sudo bash ./apache-tomcat-8.5.99/bin/catalina.sh start
+                 '''
+            }
+        }    
+         
+    }
+}
