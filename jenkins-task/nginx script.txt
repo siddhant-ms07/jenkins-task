@@ -3,7 +3,7 @@ Nginx configuration using pipeline and webhooks:---
 
 1) Create a repository
 2) Create a clone of repo with our git 
-3) Create a file in vs code and push into the gihub
+3) Create a file in vs code and push into the github
    #!/bin/bash
    sudo apt update
    sudo apt-get install nginx
