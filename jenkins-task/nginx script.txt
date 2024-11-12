@@ -38,7 +38,7 @@ step1:- new node--> (xyz)
                         (credential-->add-->kind-->SSH username with private key-->ID-->description-->username-->enter directly key)
         host key verification-->(non verifying verification)
         availability-->(keep this agent online)
-        aunch agent 
+        launch agent 
 
 
 step2:- node get online go to dash board and create a new item
